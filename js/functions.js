@@ -1,6 +1,4 @@
-function checkLength(string, maxLength) {
-  return (string.length <= maxLength);
-}
+const checkLength = (string, maxLength) => string.length <= maxLength;
 
 function isPalindrome(string) {
   const normalizedString = string.replaceAll(' ','').toLowerCase();
