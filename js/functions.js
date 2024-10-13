@@ -19,3 +19,14 @@ function getDigitsFromString(string) {
   }
   return digit.length === 0 ? NaN : digit;
 }
+
+const getTimeInMinutes = (time) => {
+  const hoursAndMinutes = time.split(':');
+  return Number(hoursAndMinutes[0]) * 60 + Number(hoursAndMinutes[1]);
+}
+
+function checkTime(workStart, workEnd, meetingStart, duration) {
+  const meetingStartInMinutes = getTimeInMinutes(meetingStart);
+  return meetingStartInMinutes >= getTimeInMinutes(workStart) &&
+  meetingStartInMinutes + duration <= getTimeInMinutes(workEnd);
+}
