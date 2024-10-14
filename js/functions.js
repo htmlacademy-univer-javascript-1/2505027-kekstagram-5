@@ -30,3 +30,8 @@ function checkMeetingTime(workStart, workEnd, meetingStart, duration) {
   return meetingStartInMinutes >= getTimeInMinutes(workStart) &&
   meetingStartInMinutes + duration <= getTimeInMinutes(workEnd);
 }
+
+checkMeetingTime();
+getDigitsFromString();
+isPalindrome();
+checkLength();
