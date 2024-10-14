@@ -6,7 +6,7 @@ function getRandomInteger(firstLimit,secondLimit) {
 
 const getRandomArrayElement = (array) => array[getRandomInteger(0,array.length - 1)];
 
-function range(start,end) {
+function getIntegerRange(start,end) {
   const result = [];
   for (let i = start; i < end; i++) {
     result.push(i);
@@ -25,4 +25,4 @@ function getRandomNumberWithNoRepeat(usedItems,firstLimit,secondLimit) {
   }
 }
 
-export {getRandomArrayElement, getRandomNumberWithNoRepeat, getRandomInteger, range};
+export {getRandomArrayElement, getRandomNumberWithNoRepeat, getRandomInteger, getIntegerRange};
