@@ -19,7 +19,3 @@ function getDigitsFromString(string) {
   }
   return digit.length === 0 ? NaN : digit;
 }
-
-checkLength();
-getDigitsFromString();
-isPalindrome();
