@@ -1,4 +1,4 @@
-import {getRandomArrayElement, getRandomNumberWithNoRepeat, getRandomInteger, range} from './util';
+import {getRandomArrayElement, getRandomNumberWithNoRepeat, getRandomInteger, getIntegerRange} from './util';
 
 const DESCRIPTIONS = [
   'На фото изображена тихая улица с яркими осенними деревьями вдоль тротуаров.',
@@ -43,7 +43,7 @@ const createComment = () => ({
   name: getRandomArrayElement(NAMES),
 });
 
-const ids = range(1,26).reverse();
+const ids = getIntegerRange(1,26).reverse();
 const urls = ids.map((num) => `photos/${num}.jpg`);
 
 
