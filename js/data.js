@@ -1,4 +1,4 @@
-import {getRandomArrayElement, getRandomNumberWithNoRepeat, getRandomInteger, getIntegerRange} from './util';
+import {getRandomArrayElement, getRandomNumberWithNoRepeat, getRandomInteger, getIntegerRange} from './util.js';
 
 const DESCRIPTIONS = [
   'На фото изображена тихая улица с яркими осенними деревьями вдоль тротуаров.',
@@ -55,8 +55,6 @@ const createPhoto = () => ({
   comments: Array.from({length: getRandomInteger(0,30)},createComment)
 });
 
-const PHOTO_DESCRIPTIONS_COUNT = 25;
-
-const createPhotos = () => Array.from({length: PHOTO_DESCRIPTIONS_COUNT}, createPhoto);
+const createPhotos = (count) => Array.from({length: count}, createPhoto);
 
 export {createPhotos};

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const checkLength = (string, maxLength) => string.length <= maxLength;
 
 function isPalindrome(string) {
@@ -30,8 +31,3 @@ function checkMeetingTime(workStart, workEnd, meetingStart, duration) {
   return meetingStartInMinutes >= getTimeInMinutes(workStart) &&
   meetingStartInMinutes + duration <= getTimeInMinutes(workEnd);
 }
-
-checkMeetingTime();
-getDigitsFromString();
-isPalindrome();
-checkLength();
