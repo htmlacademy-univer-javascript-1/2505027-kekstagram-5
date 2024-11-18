@@ -1,4 +1,5 @@
-import {createPhotos} from './data.js';
+import { createPhotos } from './data.js';
+import { openBigPicture } from './bigPicture.js';
 
 const pictureTemplate = document.querySelector('#picture').content;
 const pictureElement = pictureTemplate.querySelector('.picture');
@@ -14,6 +15,10 @@ createdPictures.forEach(({url, description, likes, comments}) => {
   pictureElementClone.querySelector('.picture__likes').textContent = likes;
   pictureElementClone.querySelector('.picture__comments').textContent = comments.length;
   fragment.appendChild(pictureElementClone);
+  pictureElementClone.addEventListener('click', (evt) => {
+    evt.preventDefault();
+    openBigPicture(url,description,likes,comments);
+  });
 });
 
 picturesList.appendChild(fragment);
