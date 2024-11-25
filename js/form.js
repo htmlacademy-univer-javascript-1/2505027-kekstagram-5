@@ -11,7 +11,7 @@ const HASHTAG_PATTERN = /^#[A-Za-zА-Яа-я0-9]{1,20}$/;
 const isEscapeKey = (evt) => evt.key === 'Escape';
 
 function handleEscapeKey(event) {
-  if (isEscapeKey(event) && [commentInput, uploadInput].some((el) => el === document.activeElement)) {
+  if (isEscapeKey(event) && ![commentInput, hashtagInput].some((el) => el === document.activeElement)) {
     closeForm();
   }
 }
