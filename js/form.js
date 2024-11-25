@@ -6,12 +6,12 @@ const hashtagInput = form.querySelector('.text__hashtags');
 const commentInput = form.querySelector('.text__description');
 
 const HASHTAG_PATTERN = /^#[A-Za-zА-Яа-я0-9]{1,20}$/;
-
+let scaleValue = 100;
 
 const isEscapeKey = (evt) => evt.key === 'Escape';
 
 function handleEscapeKey(event) {
-  if (isEscapeKey(event) && [commentInput, uploadInput].some((el) => el === document.activeElement)) {
+  if (isEscapeKey(event) && [commentInput, hashtagInput].some((el) => el === document.activeElement)) {
     closeForm();
   }
 }
@@ -22,6 +22,7 @@ function closeForm() {
   closeButton.removeEventListener('click', closeForm);
   uploadOverlay.classList.add('hidden');
   form.reset();
+  scaleValue = 100;
 }
 
 function openForm() {
@@ -29,6 +30,7 @@ function openForm() {
   document.addEventListener('keydown', handleEscapeKey);
   closeButton.addEventListener('click', closeForm);
   uploadOverlay.classList.remove('hidden');
+  updateScale();
 }
 
 const pristine = new Pristine(form);
@@ -68,5 +70,29 @@ form.addEventListener('submit', (evt) => {
   const isValid = pristine.validate();
   if (isValid) {
     form.submit();
+  }
+});
+
+const scaleControlSmallerButton = form.querySelector('.scale__control--smaller');
+const scaleControlBiggerButton = form.querySelector('.scale__control--bigger');
+const valueInput = form.querySelector('.scale__control--value');
+const imagePreview = document.querySelector('.img-upload__preview img');
+
+function updateScale() {
+  valueInput.value = `${scaleValue}%`;
+  imagePreview.style.transform = `scale(${scaleValue / 100})`;
+}
+
+scaleControlSmallerButton.addEventListener('click', () => {
+  if (scaleValue > 25) {
+    scaleValue -= 25;
+    updateScale();
+  }
+});
+
+scaleControlBiggerButton.addEventListener('click', () => {
+  if (scaleValue < 100) {
+    scaleValue += 25;
+    updateScale();
   }
 });
