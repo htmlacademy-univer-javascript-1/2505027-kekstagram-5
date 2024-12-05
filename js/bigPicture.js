@@ -5,9 +5,11 @@ const commentList = bigPicture.querySelector('.social__comments');
 const commentsLoaderButton = bigPicture.querySelector('.comments-loader');
 const commentCounter = bigPicture.querySelector('.social__comment-count');
 let commentCount = 0;
-const isEscapeKey = (evt) => evt.key === 'Escape';
+
 
 let handleCommentsLoaderClick;
+
+const isEscapeKey = (evt) => evt.key === 'Escape';
 
 function handleEscapeKey(event) {
   if (isEscapeKey(event)) {
