@@ -1,3 +1,4 @@
+import { sendData } from './api.js';
 const uploadInput = document.querySelector('.img-upload__input');
 const uploadOverlay = document.querySelector('.img-upload__overlay');
 const form = document.querySelector('.img-upload__form');
@@ -22,6 +23,7 @@ function closeForm() {
   closeButton.removeEventListener('click', closeForm);
   uploadOverlay.classList.add('hidden');
   form.reset();
+  applyFilter('none', 0);
   scaleValue = 100;
 }
 
@@ -64,14 +66,6 @@ pristine.addValidator(hashtagInput, (value) => validateHashtags(value).valid, (v
 pristine.addValidator(commentInput, (value) => value.length < 140, 'Длина комментария не может составлять больше 140 символов');
 
 uploadInput.addEventListener('change', openForm);
-
-form.addEventListener('submit', (evt) => {
-  evt.preventDefault();
-  const isValid = pristine.validate();
-  if (isValid) {
-    form.submit();
-  }
-});
 
 const scaleControlSmallerButton = form.querySelector('.scale__control--smaller');
 const scaleControlBiggerButton = form.querySelector('.scale__control--bigger');
@@ -121,7 +115,7 @@ noUiSlider.create(sliderElement, {
   connect: 'lower',
 });
 
-const applyFilter = (filter, value, unit) => {
+function applyFilter(filter, value, unit) {
   if (filter === 'none') {
     imagePreview.style.filter = 'none';
     sliderContainer.style.display = 'none';
@@ -129,7 +123,7 @@ const applyFilter = (filter, value, unit) => {
     imagePreview.style.filter = `${filter}(${value}${unit})`;
     sliderContainer.style.display = 'block';
   }
-};
+}
 
 const updateOptions = (min, max, step) => {
   isUpdatingSlider = true;
@@ -169,3 +163,100 @@ effectInputs.forEach((input) => {
     updateImage();
   });
 });
+
+const successMessage = document.querySelector('#success').content.querySelector('.success');
+const successMessageCloseButton = successMessage.querySelector('.success__button');
+
+function closeSuccessMessage() {
+  successMessage.remove();
+  document.removeEventListener('keydown', successMessageEcsHandle);
+  document.removeEventListener('click', successMessageOutsideClick);
+}
+
+function successMessageEcsHandle(evt) {
+  if (isEscapeKey(evt)) {
+    closeSuccessMessage();
+  }
+}
+
+let ignoreFirstClick = false;
+
+function successMessageOutsideClick(evt) {
+  if (ignoreFirstClick) {
+    ignoreFirstClick = false;
+    return;
+  }
+  if (!successMessage.querySelector('.success__inner').contains(evt.target)) {
+    closeSuccessMessage();
+  }
+}
+
+function showSuccessMessage() {
+  document.body.appendChild(successMessage);
+  ignoreFirstClick = true;
+  successMessageCloseButton.addEventListener('click', closeSuccessMessage);
+  document.addEventListener('keydown', successMessageEcsHandle);
+  document.addEventListener('click', successMessageOutsideClick);
+}
+
+const errorMessageTemplate = document.querySelector('#error').content.querySelector('.error');
+const errorMessage = errorMessageTemplate.cloneNode(true);
+const errorMessageCloseButton = errorMessage.querySelector('.error__button');
+
+const closeErrorMessage = () => {
+  errorMessage.remove();
+  document.removeEventListener('keydown', errorMessageEcsHandle);
+  document.removeEventListener('click', errorMessageOutsideClick);
+};
+
+function errorMessageEcsHandle(evt) {
+  if (isEscapeKey(evt)) {
+    closeErrorMessage();
+  }
+}
+
+function errorMessageOutsideClick(evt) {
+  if (!errorMessage.querySelector('.error__inner').contains(evt.target)) {
+    closeErrorMessage();
+  }
+}
+
+const showErrorMessage = () => {
+  document.body.appendChild(errorMessage);
+  errorMessageCloseButton.addEventListener('click', closeErrorMessage);
+  document.addEventListener('keydown', errorMessageEcsHandle);
+  document.addEventListener('click', errorMessageOutsideClick);
+};
+
+const submitButton = document.querySelector('.img-upload__submit');
+
+const SubmitButtonText = {
+  IDLE: 'Сохранить',
+  SENDING: 'Сохраняю...'
+};
+
+const blockSubmitButton = () => {
+  submitButton.disabled = true;
+  submitButton.textContent = SubmitButtonText.SENDING;
+};
+
+const unblockSubmitButton = () => {
+  submitButton.disabled = false;
+  submitButton.textContent = SubmitButtonText.IDLE;
+};
+
+form.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+  const isValid = pristine.validate();
+  if (isValid) {
+    blockSubmitButton();
+    sendData(new FormData(evt.target)).then(() => {
+      closeForm();
+      showSuccessMessage();
+    }).catch(() => {
+      closeForm();
+      showErrorMessage();
+    }).finally(unblockSubmitButton());
+  }
+});
+
