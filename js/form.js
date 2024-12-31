@@ -1,4 +1,10 @@
 import { sendData } from './api.js';
+import { isEscapeKey } from './util.js';
+import { showSuccessMessage } from './noUISlider.js';
+import { showErrorMessage } from './errorMessage.js';
+import { unblockSubmitButton, blockSubmitButton } from './submitButton.js';
+import './photoPreview.js';
+
 const uploadInput = document.querySelector('.img-upload__input');
 const uploadOverlay = document.querySelector('.img-upload__overlay');
 const form = document.querySelector('.img-upload__form');
@@ -9,8 +15,6 @@ const commentInput = form.querySelector('.text__description');
 const HASHTAG_PATTERN = /^#[A-Za-zА-Яа-я0-9]{1,20}$/;
 let scaleValue = 100;
 
-const isEscapeKey = (evt) => evt.key === 'Escape';
-
 function handleEscapeKey(event) {
   if (isEscapeKey(event) && ![commentInput, hashtagInput].some((el) => el === document.activeElement)) {
     closeForm();
@@ -18,6 +22,8 @@ function handleEscapeKey(event) {
 }
 
 function closeForm() {
+  const errorElements = document.querySelectorAll('.pristine-error');
+  errorElements.forEach((element) => element.remove());
   document.querySelector('body').classList.remove('modal-open');
   document.removeEventListener('keydown', handleEscapeKey);
   closeButton.removeEventListener('click', closeForm);
@@ -35,7 +41,12 @@ function openForm() {
   updateScale();
 }
 
-const pristine = new Pristine(form);
+const pristine = new Pristine(form, {
+  classTo: 'img-upload__field-wrapper',
+  errorTextParent: 'img-upload__field-wrapper',
+  errorTextTag: 'div',
+  errorTextClass: 'pristine-error',
+});
 
 function validateHashtags(value) {
   if (!value) {
@@ -147,7 +158,7 @@ const updateImage = () => {
   }
   const selectedEffect = document.querySelector('input[name="effect"]:checked').value;
   const { min, max, step, filter, unit } = effectSettings[selectedEffect];
-  effectLevel.value = newFilter ? 100 : sliderElement.noUiSlider.get();
+  effectLevel.value = newFilter ? 100 : parseFloat(sliderElement.noUiSlider.get()).toFixed(step % 1 === 0 ? 0 : 1);
   newFilter = false;
   updateOptions(min, max, step);
   applyFilter(filter, effectLevel.value, unit);
@@ -164,91 +175,9 @@ effectInputs.forEach((input) => {
   });
 });
 
-const successMessage = document.querySelector('#success').content.querySelector('.success');
-const successMessageCloseButton = successMessage.querySelector('.success__button');
-
-function closeSuccessMessage() {
-  successMessage.remove();
-  document.removeEventListener('keydown', successMessageEcsHandle);
-  document.removeEventListener('click', successMessageOutsideClick);
-}
-
-function successMessageEcsHandle(evt) {
-  if (isEscapeKey(evt)) {
-    closeSuccessMessage();
-  }
-}
-
-let ignoreFirstClick = false;
-
-function successMessageOutsideClick(evt) {
-  if (ignoreFirstClick) {
-    ignoreFirstClick = false;
-    return;
-  }
-  if (!successMessage.querySelector('.success__inner').contains(evt.target)) {
-    closeSuccessMessage();
-  }
-}
-
-function showSuccessMessage() {
-  document.body.appendChild(successMessage);
-  ignoreFirstClick = true;
-  successMessageCloseButton.addEventListener('click', closeSuccessMessage);
-  document.addEventListener('keydown', successMessageEcsHandle);
-  document.addEventListener('click', successMessageOutsideClick);
-}
-
-const errorMessageTemplate = document.querySelector('#error').content.querySelector('.error');
-const errorMessage = errorMessageTemplate.cloneNode(true);
-const errorMessageCloseButton = errorMessage.querySelector('.error__button');
-
-const closeErrorMessage = () => {
-  errorMessage.remove();
-  document.removeEventListener('keydown', errorMessageEcsHandle);
-  document.removeEventListener('click', errorMessageOutsideClick);
-};
-
-function errorMessageEcsHandle(evt) {
-  if (isEscapeKey(evt)) {
-    closeErrorMessage();
-  }
-}
-
-function errorMessageOutsideClick(evt) {
-  if (!errorMessage.querySelector('.error__inner').contains(evt.target)) {
-    closeErrorMessage();
-  }
-}
-
-const showErrorMessage = () => {
-  document.body.appendChild(errorMessage);
-  errorMessageCloseButton.addEventListener('click', closeErrorMessage);
-  document.addEventListener('keydown', errorMessageEcsHandle);
-  document.addEventListener('click', errorMessageOutsideClick);
-};
-
-const submitButton = document.querySelector('.img-upload__submit');
-
-const SubmitButtonText = {
-  IDLE: 'Сохранить',
-  SENDING: 'Сохраняю...'
-};
-
-const blockSubmitButton = () => {
-  submitButton.disabled = true;
-  submitButton.textContent = SubmitButtonText.SENDING;
-};
-
-const unblockSubmitButton = () => {
-  submitButton.disabled = false;
-  submitButton.textContent = SubmitButtonText.IDLE;
-};
-
 form.addEventListener('submit', (evt) => {
   evt.preventDefault();
-  const isValid = pristine.validate();
-  if (isValid) {
+  if (pristine.validate()) {
     blockSubmitButton();
     sendData(new FormData(evt.target)).then(() => {
       closeForm();
@@ -256,7 +185,9 @@ form.addEventListener('submit', (evt) => {
     }).catch(() => {
       closeForm();
       showErrorMessage();
-    }).finally(unblockSubmitButton());
+    }).finally(() => {
+      unblockSubmitButton();
+    });
   }
 });
 

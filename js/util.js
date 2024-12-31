@@ -25,6 +25,8 @@ function getRandomNumberWithNoRepeat(usedItems,firstLimit,secondLimit) {
   }
 }
 
+const isEscapeKey = (evt) => evt.key === 'Escape';
+
 function showError(message) {
   const errorBlock = document.createElement('div');
   errorBlock.style.display = 'flex';
@@ -53,4 +55,4 @@ function showError(message) {
   document.body.appendChild(errorBlock);
 }
 
-export {getRandomArrayElement, getRandomNumberWithNoRepeat, getRandomInteger, getIntegerRange, showError};
+export {getRandomArrayElement, getRandomNumberWithNoRepeat, getRandomInteger, getIntegerRange, showError, isEscapeKey};
