@@ -14,5 +14,6 @@ fileChooser.addEventListener('change', () => {
     previewSmallImages.forEach((element) => {
       element.style.backgroundImage = `url(${url})`;
     });
+    previewImage.src = URL.createObjectURL(file);
   }
 });
