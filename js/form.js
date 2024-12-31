@@ -1,3 +1,10 @@
+import { sendData } from './api.js';
+import { isEscapeKey } from './util.js';
+import { showSuccessMessage } from './noUISlider.js';
+import { showErrorMessage } from './errorMessage.js';
+import { unblockSubmitButton, blockSubmitButton } from './submitButton.js';
+import './photoPreview.js';
+
 const uploadInput = document.querySelector('.img-upload__input');
 const uploadOverlay = document.querySelector('.img-upload__overlay');
 const form = document.querySelector('.img-upload__form');
@@ -8,8 +15,6 @@ const commentInput = form.querySelector('.text__description');
 const HASHTAG_PATTERN = /^#[A-Za-zА-Яа-я0-9]{1,20}$/;
 let scaleValue = 100;
 
-const isEscapeKey = (evt) => evt.key === 'Escape';
-
 function handleEscapeKey(event) {
   if (isEscapeKey(event) && ![commentInput, hashtagInput].some((el) => el === document.activeElement)) {
     closeForm();
@@ -17,11 +22,14 @@ function handleEscapeKey(event) {
 }
 
 function closeForm() {
+  const errorElements = document.querySelectorAll('.pristine-error');
+  errorElements.forEach((element) => element.remove());
   document.querySelector('body').classList.remove('modal-open');
   document.removeEventListener('keydown', handleEscapeKey);
   closeButton.removeEventListener('click', closeForm);
   uploadOverlay.classList.add('hidden');
   form.reset();
+  applyFilter('none', 0);
   scaleValue = 100;
 }
 
@@ -33,7 +41,12 @@ function openForm() {
   updateScale();
 }
 
-const pristine = new Pristine(form);
+const pristine = new Pristine(form, {
+  classTo: 'img-upload__field-wrapper',
+  errorTextParent: 'img-upload__field-wrapper',
+  errorTextTag: 'div',
+  errorTextClass: 'pristine-error',
+});
 
 function validateHashtags(value) {
   if (!value) {
@@ -64,14 +77,6 @@ pristine.addValidator(hashtagInput, (value) => validateHashtags(value).valid, (v
 pristine.addValidator(commentInput, (value) => value.length < 140, 'Длина комментария не может составлять больше 140 символов');
 
 uploadInput.addEventListener('change', openForm);
-
-form.addEventListener('submit', (evt) => {
-  evt.preventDefault();
-  const isValid = pristine.validate();
-  if (isValid) {
-    form.submit();
-  }
-});
 
 const scaleControlSmallerButton = form.querySelector('.scale__control--smaller');
 const scaleControlBiggerButton = form.querySelector('.scale__control--bigger');
@@ -121,7 +126,7 @@ noUiSlider.create(sliderElement, {
   connect: 'lower',
 });
 
-const applyFilter = (filter, value, unit) => {
+function applyFilter(filter, value, unit) {
   if (filter === 'none') {
     imagePreview.style.filter = 'none';
     sliderContainer.style.display = 'none';
@@ -129,7 +134,7 @@ const applyFilter = (filter, value, unit) => {
     imagePreview.style.filter = `${filter}(${value}${unit})`;
     sliderContainer.style.display = 'block';
   }
-};
+}
 
 const updateOptions = (min, max, step) => {
   isUpdatingSlider = true;
@@ -153,7 +158,7 @@ const updateImage = () => {
   }
   const selectedEffect = document.querySelector('input[name="effect"]:checked').value;
   const { min, max, step, filter, unit } = effectSettings[selectedEffect];
-  effectLevel.value = newFilter ? 100 : sliderElement.noUiSlider.get();
+  effectLevel.value = newFilter ? 100 : parseFloat(sliderElement.noUiSlider.get()).toFixed(step % 1 === 0 ? 0 : 1);
   newFilter = false;
   updateOptions(min, max, step);
   applyFilter(filter, effectLevel.value, unit);
@@ -169,3 +174,20 @@ effectInputs.forEach((input) => {
     updateImage();
   });
 });
+
+form.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+  if (pristine.validate()) {
+    blockSubmitButton();
+    sendData(new FormData(evt.target)).then(() => {
+      closeForm();
+      showSuccessMessage();
+    }).catch(() => {
+      closeForm();
+      showErrorMessage();
+    }).finally(() => {
+      unblockSubmitButton();
+    });
+  }
+});
+
