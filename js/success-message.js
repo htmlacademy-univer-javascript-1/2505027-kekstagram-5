@@ -14,13 +14,7 @@ function successMessageEscapeHandler(evt) {
   }
 }
 
-let ignoreFirstClick = false;
-
 function successMessageOutsideClickHandler(evt) {
-  if (ignoreFirstClick) {
-    ignoreFirstClick = false;
-    return;
-  }
   if (!successMessage.querySelector('.success__inner').contains(evt.target)) {
     closeSuccessMessage();
   }
@@ -28,7 +22,6 @@ function successMessageOutsideClickHandler(evt) {
 
 function showSuccessMessage() {
   document.body.appendChild(successMessage);
-  ignoreFirstClick = true;
   successMessageCloseButton.addEventListener('click', closeSuccessMessage);
   document.addEventListener('keydown', successMessageEscapeHandler);
   document.addEventListener('click', successMessageOutsideClickHandler);
