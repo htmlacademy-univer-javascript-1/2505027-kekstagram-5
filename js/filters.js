@@ -24,23 +24,26 @@ function setActiveFilter(activeFilter) {
 }
 
 function setDefaultFilterClick(callback) {
+  const debouncedCallback = debounce(callback);
   defaultFilter.addEventListener('click', () => {
     setActiveFilter(defaultFilter);
-    debounce(callback)();
+    debouncedCallback();
   });
 }
 
 function setRandomFilterClick(callback) {
+  const debouncedCallback = debounce(callback);
   randomFilter.addEventListener('click', () => {
     setActiveFilter(randomFilter);
-    debounce(callback)();
+    debouncedCallback();
   });
 }
 
 function setDiscussedFilterClick(callback) {
+  const debouncedCallback = debounce(callback);
   discussedFilter.addEventListener('click', () => {
     setActiveFilter(discussedFilter);
-    debounce(callback)();
+    debouncedCallback();
   });
 }
 
