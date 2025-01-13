@@ -5,17 +5,17 @@ const errorMessageCloseButton = errorMessage.querySelector('.error__button');
 
 const closeErrorMessage = () => {
   errorMessage.remove();
-  document.removeEventListener('keydown', errorMessageEcsHandle);
-  document.removeEventListener('click', errorMessageOutsideClick);
+  document.removeEventListener('keydown', errorMessageEscapeHandler);
+  document.removeEventListener('click', errorMessageOutsideClickHandler);
 };
 
-function errorMessageEcsHandle(evt) {
+function errorMessageEscapeHandler(evt) {
   if (isEscapeKey(evt)) {
     closeErrorMessage();
   }
 }
 
-function errorMessageOutsideClick(evt) {
+function errorMessageOutsideClickHandler(evt) {
   if (!errorMessage.querySelector('.error__inner').contains(evt.target)) {
     closeErrorMessage();
   }
@@ -24,8 +24,8 @@ function errorMessageOutsideClick(evt) {
 const showErrorMessage = () => {
   document.body.appendChild(errorMessage);
   errorMessageCloseButton.addEventListener('click', closeErrorMessage);
-  document.addEventListener('keydown', errorMessageEcsHandle);
-  document.addEventListener('click', errorMessageOutsideClick);
+  document.addEventListener('keydown', errorMessageEscapeHandler);
+  document.addEventListener('click', errorMessageOutsideClickHandler);
 };
 
 export {showErrorMessage};

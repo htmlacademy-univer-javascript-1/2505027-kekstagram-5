@@ -1,9 +1,9 @@
 import { sendData } from './api.js';
 import { isEscapeKey } from './util.js';
-import { showSuccessMessage } from './noUISlider.js';
-import { showErrorMessage } from './errorMessage.js';
-import { unblockSubmitButton, blockSubmitButton } from './submitButton.js';
-import './photoPreview.js';
+import { showSuccessMessage } from './success-message.js';
+import { showErrorMessage } from './error-message.js';
+import { unblockSubmitButton, blockSubmitButton } from './submit-button.js';
+import './photo-preview.js';
 
 const uploadInput = document.querySelector('.img-upload__input');
 const uploadOverlay = document.querySelector('.img-upload__overlay');
@@ -15,7 +15,7 @@ const commentInput = form.querySelector('.text__description');
 const HASHTAG_PATTERN = /^#[A-Za-zА-Яа-я0-9]{1,20}$/;
 let scaleValue = 100;
 
-function handleEscapeKey(event) {
+function escapeKeyHandler(event) {
   if (isEscapeKey(event) && ![commentInput, hashtagInput].some((el) => el === document.activeElement)) {
     closeForm();
   }
@@ -25,7 +25,7 @@ function closeForm() {
   const errorElements = document.querySelectorAll('.pristine-error');
   errorElements.forEach((element) => element.remove());
   document.querySelector('body').classList.remove('modal-open');
-  document.removeEventListener('keydown', handleEscapeKey);
+  document.removeEventListener('keydown', escapeKeyHandler);
   closeButton.removeEventListener('click', closeForm);
   uploadOverlay.classList.add('hidden');
   form.reset();
@@ -35,7 +35,7 @@ function closeForm() {
 
 function openForm() {
   document.querySelector('body').classList.add('modal-open');
-  document.addEventListener('keydown', handleEscapeKey);
+  document.addEventListener('keydown', escapeKeyHandler);
   closeButton.addEventListener('click', closeForm);
   uploadOverlay.classList.remove('hidden');
   updateScale();

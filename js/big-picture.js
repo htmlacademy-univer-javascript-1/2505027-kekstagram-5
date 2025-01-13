@@ -7,11 +7,11 @@ const commentCounter = bigPicture.querySelector('.social__comment-count');
 let commentCount = 0;
 
 
-let handleCommentsLoaderClick;
+let commentsLoaderClickHandler;
 
 const isEscapeKey = (evt) => evt.key === 'Escape';
 
-function handleEscapeKey(event) {
+function escapeKeyHandler(event) {
   if (isEscapeKey(event)) {
     closeBigPicture();
   }
@@ -45,9 +45,9 @@ function closeBigPicture() {
   bigPicture.classList.add('hidden');
   document.querySelector('body').classList.remove('modal-open');
 
-  document.removeEventListener('keydown', handleEscapeKey);
+  document.removeEventListener('keydown', escapeKeyHandler);
   closeButton.removeEventListener('click', closeBigPicture);
-  commentsLoaderButton.removeEventListener('click', handleCommentsLoaderClick);
+  commentsLoaderButton.removeEventListener('click', commentsLoaderClickHandler);
 
   commentList.innerHTML = '';
   commentCounter.textContent = '';
@@ -62,7 +62,7 @@ function openBigPicture(url, description, likes, comments) {
   updateCommentCounter(commentCount, comments.length);
   comments.forEach((comment) => createCommentElement(comment));
 
-  handleCommentsLoaderClick = () => {
+  commentsLoaderClickHandler = () => {
     commentCount = Math.min(commentCount + 5, comments.length);
     showElements(commentList.children, commentCount);
     if (commentCount === comments.length) {
@@ -71,12 +71,12 @@ function openBigPicture(url, description, likes, comments) {
     updateCommentCounter(commentCount, comments.length);
   };
 
-  commentsLoaderButton.addEventListener('click', handleCommentsLoaderClick);
+  commentsLoaderButton.addEventListener('click', commentsLoaderClickHandler);
   commentsLoaderButton.style.display = comments.length > 5 ? 'block' : 'none';
 
   showElements(commentList.children, commentCount);
   document.querySelector('body').classList.add('modal-open');
-  document.addEventListener('keydown', handleEscapeKey);
+  document.addEventListener('keydown', escapeKeyHandler);
   closeButton.addEventListener('click', closeBigPicture);
 }
 

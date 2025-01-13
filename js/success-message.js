@@ -1,14 +1,14 @@
-import {isEscapeKey} from './util.js';
+import { isEscapeKey } from './util.js';
 const successMessage = document.querySelector('#success').content.querySelector('.success');
 const successMessageCloseButton = successMessage.querySelector('.success__button');
 
 function closeSuccessMessage() {
   successMessage.remove();
-  document.removeEventListener('keydown', successMessageEcsHandle);
-  document.removeEventListener('click', successMessageOutsideClick);
+  document.removeEventListener('keydown', successMessageEscapeHandler);
+  document.removeEventListener('click', successMessageOutsideClickHandler);
 }
 
-function successMessageEcsHandle(evt) {
+function successMessageEscapeHandler(evt) {
   if (isEscapeKey(evt)) {
     closeSuccessMessage();
   }
@@ -16,7 +16,7 @@ function successMessageEcsHandle(evt) {
 
 let ignoreFirstClick = false;
 
-function successMessageOutsideClick(evt) {
+function successMessageOutsideClickHandler(evt) {
   if (ignoreFirstClick) {
     ignoreFirstClick = false;
     return;
@@ -30,8 +30,8 @@ function showSuccessMessage() {
   document.body.appendChild(successMessage);
   ignoreFirstClick = true;
   successMessageCloseButton.addEventListener('click', closeSuccessMessage);
-  document.addEventListener('keydown', successMessageEcsHandle);
-  document.addEventListener('click', successMessageOutsideClick);
+  document.addEventListener('keydown', successMessageEscapeHandler);
+  document.addEventListener('click', successMessageOutsideClickHandler);
 }
 
 export {showSuccessMessage};
