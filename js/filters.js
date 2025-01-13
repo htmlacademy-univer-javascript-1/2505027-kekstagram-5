@@ -1,10 +1,10 @@
 const fitlers = document.querySelector('.img-filters');
 
-function debounce (callback, timeoutDelay = 500) {
+function debounce(callback, timeoutDelay = 500) {
   let timeoutId;
   return (...rest) => {
     clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => callback.apply(this, rest), timeoutDelay);
+    timeoutId = setTimeout(() => callback(...rest), timeoutDelay);
   };
 }
 
@@ -23,27 +23,20 @@ function setActiveFilter(activeFilter) {
   activeFilter.classList.add('img-filters__button--active');
 }
 
-function setDefaultFilterClick(callback) {
+function setupFilters(callback) {
+  const debouncedCallback = debounce(callback); // Один общий обработчик
   defaultFilter.addEventListener('click', () => {
     setActiveFilter(defaultFilter);
-    debounce(callback)();
+    debouncedCallback('default');
   });
-}
-
-function setRandomFilterClick(callback) {
   randomFilter.addEventListener('click', () => {
     setActiveFilter(randomFilter);
-    debounce(callback)();
+    debouncedCallback('random');
   });
-}
-
-function setDiscussedFilterClick(callback) {
   discussedFilter.addEventListener('click', () => {
     setActiveFilter(discussedFilter);
-    debounce(callback)();
+    debouncedCallback('discussed');
   });
 }
 
-export {setDefaultFilterClick, setDiscussedFilterClick, setRandomFilterClick, showFilters};
-
-
+export {setupFilters, showFilters};
